@@ -37,6 +37,18 @@ def test_secrets_to_env_lines_invalid_key_hyphen():
         secrets_to_env_lines({"MY-KEY": "value"})
 
 
+def test_secrets_to_env_lines_empty_value():
+    """Empty string values should produce a line with an empty quoted value."""
+    lines = secrets_to_env_lines({"EMPTY_VAR": ""})
+    assert lines == ['EMPTY_VAR=""']
+
+
+def test_secrets_to_env_lines_empty_dict():
+    """An empty secrets dict should produce an empty list of lines."""
+    lines = secrets_to_env_lines({})
+    assert lines == []
+
+
 def test_write_env_file_creates_file(tmp_path):
     dest = tmp_path / ".env"
     result = write_env_file(SIMPLE_SECRETS, output_path=dest)
