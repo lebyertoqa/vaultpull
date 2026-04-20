@@ -1,9 +1,12 @@
 """Integration helper: run validation inside the sync pipeline."""
 from __future__ import annotations
 
+import logging
 from typing import Dict, Optional
 
 from vaultpull.validate import ValidationResult, ValidationRule, load_validation_config, validate_secrets
+
+logger = logging.getLogger(__name__)
 
 
 def run_validation(
@@ -25,6 +28,13 @@ def run_validation(
     """
     rule: ValidationRule = load_validation_config(raw_config)
     result: ValidationResult = validate_secrets(secrets, rule)
+
+    if result.valid:
+        logger.debug("Secret validation passed for %d secret(s).", len(secrets))
+    else:
+        logger.warning(
+            "Secret validation failed with %d error(s).", len(result.errors)
+        )
 
     if not result.valid and strict:
         formatted = "\n".join(f"  - {e}" for e in result.errors)
