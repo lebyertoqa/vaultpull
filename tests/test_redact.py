@@ -82,6 +82,10 @@ def test_redact_dict_does_not_mutate_original():
     assert secrets["TOKEN"] == "abc123"
 
 
+def test_redact_dict_empty_dict_returns_empty():
+    assert redact_dict({}) == {}
+
+
 # ---------------------------------------------------------------------------
 # redact_message
 # ---------------------------------------------------------------------------
@@ -101,7 +105,10 @@ def test_redact_message_ignores_non_sensitive_values():
     assert result == msg
 
 
-def test_redact_message_empty_value_skipped():
-    secrets = {"DB_PASSWORD": ""}
-    msg = "some log line"
-    assert redact_message(msg, secrets) == msg
+def test_redact_message_multiple_secrets_all_replaced():
+    secrets = {"DB_PASSWORD": "hunter2", "API_KEY": "s3cr3t"}
+    msg = "auth=hunter2 key=s3cr3t"
+    result = redact_message(msg, secrets)
+    assert "hunter2" not in result
+    assert "s3cr3t" not in result
+    assert result.count(_PLACEHOLDER) == 2
