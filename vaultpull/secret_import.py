@@ -46,6 +46,11 @@ class ImportResult:
     def total(self) -> int:
         return len(self.imported)
 
+    @property
+    def ok(self) -> bool:
+        """Return True if there were no errors during import."""
+        return len(self.errors) == 0
+
 
 def _parse_env_line(line: str):
     """Parse a single KEY=VALUE line. Returns (key, value) or None."""
