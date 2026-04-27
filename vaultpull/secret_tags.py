@@ -64,3 +64,20 @@ def apply_tag_filter(
         for k, v in secrets.items()
         if secret_matches_tags(v, cfg)
     }
+
+
+def group_secrets_by_tag(
+    secrets: Dict[str, Dict], cfg: TagConfig
+) -> Dict[str, List[str]]:
+    """Group secret keys by their tags.
+
+    Returns a dict mapping each tag value to the list of secret keys that
+    carry that tag.  Secrets not matching the tag filter are excluded.
+    """
+    groups: Dict[str, List[str]] = {}
+    for key, secret in secrets.items():
+        if not secret_matches_tags(secret, cfg):
+            continue
+        for tag in extract_tags(secret, cfg.tag_prefix):
+            groups.setdefault(tag, []).append(key)
+    return groups
