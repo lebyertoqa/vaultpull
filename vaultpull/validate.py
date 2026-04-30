@@ -45,7 +45,13 @@ def validate_secrets(secrets: Dict[str, str], rule: ValidationRule) -> Validatio
         if key in secrets:
             errors.append(f"Forbidden key present: {key}")
 
-    pattern = re.compile(rule.key_pattern) if rule.key_pattern else None
+    try:
+        pattern = re.compile(rule.key_pattern) if rule.key_pattern else None
+    except re.error as exc:
+        return ValidationResult(
+            valid=False,
+            errors=[f"Invalid key_pattern regex '{rule.key_pattern}': {exc}"],
+        )
 
     for key, value in secrets.items():
         if pattern and not pattern.match(key):
