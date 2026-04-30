@@ -56,3 +56,19 @@ def apply_filter(secrets: Dict[str, str], config: FilterConfig) -> Dict[str, str
             result[out_key] = value
 
     return result
+
+
+def describe_filter(config: FilterConfig) -> str:
+    """Return a human-readable summary of the active filter configuration.
+
+    Useful for logging or CLI output so users can confirm which filters
+    are in effect before secrets are written.
+    """
+    parts: List[str] = []
+    if config.include_patterns:
+        parts.append(f"include: {', '.join(config.include_patterns)}")
+    if config.exclude_patterns:
+        parts.append(f"exclude: {', '.join(config.exclude_patterns)}")
+    if config.prefix_strip:
+        parts.append(f"strip prefix: '{config.prefix_strip}'")
+    return "; ".join(parts) if parts else "no filters active"
